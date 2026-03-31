@@ -1,0 +1,88 @@
+---
+title: "House Price and Unemployment Analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(tidyr)
+```
+
+## Preparing the Data
+
+```{r}
+house_prices$date <- as.Date(house_prices$date)
+```
+
+## Part (a): House Price Index Trends by State
+
+```{r}
+p1 <- ggplot(house_prices, aes(x = date, y = house_price_index)) +
+  geom_line(color = "steelblue", linewidth = 0.4) +
+  facet_wrap(~ state, ncol = 4, scales = "free_y") +
+  scale_x_date(
+    breaks = as.Date(c("1980-01-01", "2000-01-01", "2020-01-01")),
+    labels = c("'80", "'00", "'20")
+  ) +
+  labs(
+    title = "Trend of House Price Index by State",
+    x = "Year",
+    y = "House Price Index"
+  ) +
+  theme_minimal() +
+  theme(
+    strip.text = element_text(size = 8, face = "bold"),
+    axis.text.x = element_text(size = 7),
+    axis.text.y = element_text(size = 7),
+    panel.grid.minor = element_blank()
+  )
+
+p1
+```
+
+## Part (b): Reshaping the Data Using gather()
+
+```{r}
+house_reshaped <- gather(
+  house_prices,
+  key = "measure",
+  value = "value",
+  -date, -state, -house_price_perc
+)
+
+head(house_reshaped)
+```
+
+## Part (c): Plotting House Price Index and Unemployment Percentage Together
+
+```{r}
+p2 <- ggplot(house_reshaped, aes(x = date, y = value, color = measure)) +
+  geom_line(linewidth = 0.4) +
+  facet_wrap(~ state, ncol = 4, scales = "free_y") +
+  scale_x_date(
+    breaks = as.Date(c("1980-01-01", "2000-01-01", "2020-01-01")),
+    labels = c("'80", "'00", "'20")
+  ) +
+  labs(
+    title = "House Price Index and Unemployment Percentage by State",
+    x = "Year",
+    y = "Value",
+    color = "Measure"
+  ) +
+  theme_minimal() +
+  theme(
+    strip.text = element_text(size = 8, face = "bold"),
+    axis.text.x = element_text(size = 7),
+    axis.text.y = element_text(size = 7),
+    panel.grid.minor = element_blank()
+  )
+
+p2
+```
+
+## Comment
+
+###This graph is not the best way to present house price index and unemployment percentage together because the two variables are measured on different scales. When both are plotted on the same y-axis, one variable can dominate the chart while the other appears much smaller, which makes comparison difficult. Although the graph allows us to view both trends within each state, separate plots or standardized values would make the information easier to interpret.
+
+
